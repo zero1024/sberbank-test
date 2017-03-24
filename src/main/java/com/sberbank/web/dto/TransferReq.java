@@ -1,7 +1,10 @@
 package com.sberbank.web.dto;
 
+import javax.validation.GroupSequence;
+import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 import java.math.BigDecimal;
 
 public class TransferReq {
@@ -37,4 +40,19 @@ public class TransferReq {
     public void setMoney(BigDecimal money) {
         this.money = money;
     }
+
+    @AssertFalse(message = "Transfer on the same account is not allowed!", groups = FinalValidation.class)
+    public boolean isTransferOnTheSameAccount() {
+        return accountFrom.equals(accountTo);
+    }
+
+    public interface FinalValidation {
+    }
+
+    @GroupSequence({Default.class, FinalValidation.class})
+    public interface ValidationSequence {
+    }
+
 }
+
+

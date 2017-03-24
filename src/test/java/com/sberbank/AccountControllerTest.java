@@ -73,8 +73,8 @@ public class AccountControllerTest {
         //2. в запросе указано мало денег
         Map<String, Object> req = new HashMap<>();
         req.put("account", "some");
-        req.put("accountFrom", "some");
-        req.put("accountTo", "some");
+        req.put("accountFrom", "some1");
+        req.put("accountTo", "some2");
         req.put("money", new BigDecimal("00.00"));
         res = restTemplate.exchange("/putMoney", POST, new HttpEntity<>(req), Map.class);
         assert res.getStatusCodeValue() == 400;
@@ -85,6 +85,15 @@ public class AccountControllerTest {
         res = restTemplate.exchange("/transferMoney", POST, new HttpEntity<>(req), Map.class);
         assert res.getStatusCodeValue() == 400;
         assert res.getBody().get("messages").equals(singletonList("min for money field is 0.001"));
+
+        //3. перевод денег на тот же аккаунт
+        req = new HashMap<>();
+        req.put("accountFrom", "some");
+        req.put("accountTo", "some");
+        req.put("money", new BigDecimal("10"));
+        res = restTemplate.exchange("/transferMoney", POST, new HttpEntity<>(req), Map.class);
+        assert res.getStatusCodeValue() == 400;
+        assert res.getBody().get("messages").equals(singletonList("Transfer on the same account is not allowed!"));
     }
 
     private BigDecimal accountMoney(String account) {
