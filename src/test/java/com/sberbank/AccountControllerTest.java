@@ -115,6 +115,8 @@ public class AccountControllerTest {
         res = restTemplate.exchange("/transferMoney", POST, new HttpEntity<>(req), Map.class);
         assert res.getStatusCodeValue() == 409;
         assert res.getBody().get("messages").equals(singletonList("Not enough money on account [constraintViolationTest1]"));
+        assert accountMoney("constraintViolationTest1").compareTo(new BigDecimal("0")) == 0;
+        assert accountMoney("constraintViolationTest2").compareTo(new BigDecimal("0")) == 0;
 
         //3. не найден аккаунт
         req = new HashMap<>();
