@@ -1,5 +1,7 @@
 package com.sberbank.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 @ControllerAdvice
 class ExceptionHandlingController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionHandlingController.class);
 
     /**
      * Ошибки консистентности базы
@@ -26,6 +29,7 @@ class ExceptionHandlingController {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseBody
     public ErrorDto handleConflict(DataIntegrityViolationException e) {
+        LOGGER.warn("Conflict", e);
         return ErrorDto.create(e.getMessage());
     }
 
@@ -36,6 +40,7 @@ class ExceptionHandlingController {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public ErrorDto handleBadRequest(MethodArgumentNotValidException e) {
+        LOGGER.warn("Bad request", e);
         return ErrorDto.create(e.getBindingResult().getFieldErrors()
                 .stream()
                 .map(FieldError::getDefaultMessage)
@@ -50,6 +55,7 @@ class ExceptionHandlingController {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public ErrorDto handleParseError(HttpMessageNotReadableException e) {
+        LOGGER.warn("Bad request", e);
         return ErrorDto.create("Bad request");
     }
 
