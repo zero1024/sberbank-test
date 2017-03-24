@@ -20,14 +20,14 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     @Transactional
-    public void putMoney(String account, BigDecimal amount) {
-        template.update("UPDATE ACCOUNT SET MONEY = MONEY+? WHERE NUMBER = ? ", amount, account);
+    public void putMoney(String account, BigDecimal money) {
+        template.update("UPDATE ACCOUNT SET MONEY = MONEY+? WHERE NUMBER = ? ", money, account);
     }
 
     @Override
     @Transactional
-    public void withdrawMoney(String account, BigDecimal amount) {
-        template.update("UPDATE ACCOUNT WHERE NUMBER = ? SET MONEY = MONEY-?", account, amount);
+    public void withdrawMoney(String account, BigDecimal money) {
+        template.update("UPDATE ACCOUNT SET MONEY = MONEY-? WHERE NUMBER = ? ", money, account);
     }
 
     @Override

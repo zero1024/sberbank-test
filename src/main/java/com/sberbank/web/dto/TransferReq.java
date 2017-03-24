@@ -1,12 +1,18 @@
 package com.sberbank.web.dto;
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class TransferReq {
 
+    @NotNull(message = "accountFrom field cannot be empty!")
     private String accountFrom;
+    @NotNull(message = "accountTo field cannot be empty!")
     private String accountTo;
-    private BigDecimal amount;
+    @NotNull(message = "money field cannot be empty!")
+    @DecimalMin(value = "0.001", message = "min for money field is 0.001")
+    private BigDecimal money;
 
     public String getAccountFrom() {
         return accountFrom;
@@ -24,11 +30,11 @@ public class TransferReq {
         this.accountTo = accountTo;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public BigDecimal getMoney() {
+        return money;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setMoney(BigDecimal money) {
+        this.money = money;
     }
 }

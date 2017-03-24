@@ -4,8 +4,11 @@ import com.sberbank.repository.AccountRepository;
 import com.sberbank.web.dto.MoneyUpdateReq;
 import com.sberbank.web.dto.TransferReq;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -21,18 +24,18 @@ public class AccountController {
     }
 
     @RequestMapping(value = "/putMoney", method = POST, produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public void putMoney(MoneyUpdateReq req) {
-        repository.putMoney(req.getNumber(), req.getAmount());
+    public void putMoney(@RequestBody @Valid MoneyUpdateReq req) {
+        repository.putMoney(req.getAccount(), req.getMoney());
     }
 
     @RequestMapping(value = "/withdrawMoney", method = POST, produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public void withdrawMoney(MoneyUpdateReq req) {
-        repository.withdrawMoney(req.getNumber(), req.getAmount());
+    public void withdrawMoney(@RequestBody @Valid MoneyUpdateReq req) {
+        repository.withdrawMoney(req.getAccount(), req.getMoney());
     }
 
     @RequestMapping(value = "/transferMoney", method = POST, produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public void transferMoney(TransferReq req) {
-        repository.transferMoney(req.getAccountFrom(), req.getAccountTo(), req.getAmount());
+    public void transferMoney(@RequestBody @Valid TransferReq req) {
+        repository.transferMoney(req.getAccountFrom(), req.getAccountTo(), req.getMoney());
     }
 
 
