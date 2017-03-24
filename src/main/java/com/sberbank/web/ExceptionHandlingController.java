@@ -1,5 +1,6 @@
 package com.sberbank.web;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -17,6 +18,16 @@ import static java.util.stream.Collectors.toList;
 @ControllerAdvice
 class ExceptionHandlingController {
 
+
+    /**
+     * Ошибки консистентности базы
+     */
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseBody
+    public ErrorDto handleConflict(DataIntegrityViolationException e) {
+        return ErrorDto.create(e.getMessage());
+    }
 
     /**
      * Ошибки валидации RequestBody

@@ -55,7 +55,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void testIncorrectReq() throws Exception {
+    public void incorrectReqTest() throws Exception {
         //1. пустые запросы
         ResponseEntity<Map> res = restTemplate.exchange("/putMoney", POST, new HttpEntity<>(new HashMap<>()), Map.class);
         assert res.getStatusCodeValue() == 400;
@@ -94,6 +94,43 @@ public class AccountControllerTest {
         res = restTemplate.exchange("/transferMoney", POST, new HttpEntity<>(req), Map.class);
         assert res.getStatusCodeValue() == 400;
         assert res.getBody().get("messages").equals(singletonList("Transfer on the same account is not allowed!"));
+    }
+
+    @Test
+    public void constraintViolationTest() throws Exception {
+        //1. снимаем
+        Map<String, Object> req = new HashMap<>();
+        req.put("account", "constraintViolationTest1");
+        req.put("money", new BigDecimal("100.21"));
+        ResponseEntity<Map> res = restTemplate.exchange("/withdrawMoney", POST, new HttpEntity<>(req), Map.class);
+        assert res.getStatusCodeValue() == 409;
+        assert res.getBody().get("messages").equals(singletonList("Not enough money on account [constraintViolationTest1]"));
+        assert accountMoney("constraintViolationTest1").compareTo(new BigDecimal("0")) == 0;
+
+        //2. переводим
+        req = new HashMap<>();
+        req.put("accountFrom", "constraintViolationTest1");
+        req.put("accountTo", "constraintViolationTest2");
+        req.put("money", new BigDecimal("10.23"));
+        res = restTemplate.exchange("/transferMoney", POST, new HttpEntity<>(req), Map.class);
+        assert res.getStatusCodeValue() == 409;
+        assert res.getBody().get("messages").equals(singletonList("Not enough money on account [constraintViolationTest1]"));
+
+        //3. не найден аккаунт
+        req = new HashMap<>();
+        req.put("account", "some");
+        req.put("accountFrom", "some1");
+        req.put("accountTo", "some2");
+        req.put("money", new BigDecimal("100.21"));
+        res = restTemplate.exchange("/putMoney", POST, new HttpEntity<>(req), Map.class);
+        assert res.getStatusCodeValue() == 409;
+        assert res.getBody().get("messages").equals(singletonList("Account [some] not found"));
+        res = restTemplate.exchange("/withdrawMoney", POST, new HttpEntity<>(req), Map.class);
+        assert res.getStatusCodeValue() == 409;
+        assert res.getBody().get("messages").equals(singletonList("Account [some] not found"));
+        res = restTemplate.exchange("/transferMoney", POST, new HttpEntity<>(req), Map.class);
+        assert res.getStatusCodeValue() == 409;
+        assert res.getBody().get("messages").equals(singletonList("Account [some1] not found"));
     }
 
     private BigDecimal accountMoney(String account) {
